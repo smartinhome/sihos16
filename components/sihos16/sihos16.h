@@ -118,6 +118,7 @@ class Sihos16 : public Component, public SpiDev, public AsyncWebHandler {
   void handle_save_(AsyncWebServerRequest *req);
   void handle_delete_(AsyncWebServerRequest *req);
   void send_system_(AsyncWebServerRequest *req);
+  void send_frame_(AsyncWebServerRequest *req);
   void handle_wifi_(AsyncWebServerRequest *req);
   void handle_leds_(AsyncWebServerRequest *req);
   void factory_reset_();

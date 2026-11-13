@@ -66,7 +66,9 @@ Konfiguracja YAML jest minimalna (`examples/sih-reader-1.6.yaml`): WiFi, piny i 
 
 Jak to działa: przy kompilacji powstaje pula 8 urządzeń, a w każdym 16 encji liczbowych i 4 tekstowe. Przy starcie moduł nadaje zajętym nazwy, jednostki i klasy z konfiguracji w NVS; reszta jest ukryta. Usunięty licznik znika z HA razem z urządzeniem.
 
-API strony: `GET /sihos16/api/state`, `GET /sihos16/api/preview?id=&key=&driver=`, `POST /sihos16/api/save`, `POST /sihos16/api/delete`, `GET /sihos16/api/system`, `POST /sihos16/api/wifi`, `POST /sihos16/api/leds`, `POST /sihos16/api/factory_reset`.
+**Ramka do analizy:** przycisk „Ramka” przy każdym liczniku (moim i słyszanym w okolicy) pokazuje ostatnią ramkę w hex z kopiowaniem i linkiem do wmbusmeters.org. Nowy licznik w zasięgu jest też raz logowany na poziomie INFO razem z ramką.
+
+API strony: `GET /sihos16/api/frame?id=`, `GET /sihos16/api/state`, `GET /sihos16/api/preview?id=&key=&driver=`, `POST /sihos16/api/save`, `POST /sihos16/api/delete`, `GET /sihos16/api/system`, `POST /sihos16/api/wifi`, `POST /sihos16/api/leds`, `POST /sihos16/api/factory_reset`.
 
 ## Testy na komputerze
 

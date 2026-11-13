@@ -60,6 +60,12 @@ input,select{font:inherit;width:100%;padding:8px;border:1px solid var(--line);bo
  <div class="fields" id="f_fields"></div>
  <div class="row msg"><button class="pri" id="savebtn" onclick="save()">Zapisz i uruchom ponownie</button><button onclick="closeForm()">Anuluj</button><span id="smsg" class="mut"></span></div>
 </div>
+<div class="card" id="frame" style="display:none">
+ <h3 style="margin:0" id="fr_t">Ramka</h3>
+ <p class="mut">Ostatnia odebrana ramka (bez CRC). Skopiuj ją i prześlij sprzedawcy modułu — razem z kluczem, jeśli licznik jest szyfrowany.</p>
+ <textarea id="fr_hex" readonly rows="4" style="width:100%;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);word-break:break-all"></textarea>
+ <div class="row msg"><button class="pri" onclick="copyFrame()">Kopiuj</button><a id="fr_a" target="_blank" rel="noopener">Analizuj na wmbusmeters.org</a><button onclick="$('frame').style.display='none'">Zamknij</button><span id="fr_m" class="mut"></span></div>
+</div>
 <div class="row"><button class="pri" onclick="openForm()">+ Dodaj licznik ręcznie</button><span class="mut" id="slots"></span></div>
 <h2>Słyszane w okolicy</h2>
 <div class="card scroll"><table><thead><tr><th>Producent</th><th>Numer</th><th>Rodzaj</th><th>Sygnał</th><th>Ramek</th><th>Ostatnio</th><th>Stan</th><th></th></tr></thead><tbody id="heard"></tbody></table>
@@ -90,10 +96,10 @@ async function load(){
  $('meters').innerHTML=S.meters.length?S.meters.map(m=>`<div class="card meter"><h3>${esc(m.name)}</h3>
   <div class="mut">${esc(m.mfct)} ${m.id} · ${esc(m.media)} · ${m.driver} · ${m.has_key?'z kluczem':'bez klucza'} · ${m.seen<0?'jeszcze nie odebrano':ago(m.seen)+', '+m.rssi+' dBm, ramek '+m.frames} · <span class="${m.status=='OK'?'ok':'bad'}">${esc(m.status)}</span></div>
   <div class="vals">${m.fields.map(f=>`<div><span>${esc(f.label)}</span><b>${fmt(f.value,f.unit)}</b></div>`).join('')||'<span class="mut">Nie wybrano pól — kliknij Edytuj.</span>'}</div>
-  <div class="row"><button onclick="openForm(${m.slot})">Edytuj</button><button class="del" onclick="del(${m.slot})">Usuń</button></div></div>`).join(''):'<div class="card mut">Nie ma jeszcze liczników. Wybierz licznik z listy „Słyszane w okolicy” albo dodaj go ręcznie.</div>';
+  <div class="row"><button onclick="openForm(${m.slot})">Edytuj</button><button onclick="showFrame('${m.id}')">Ramka</button><button class="del" onclick="del(${m.slot})">Usuń</button></div></div>`).join(''):'<div class="card mut">Nie ma jeszcze liczników. Wybierz licznik z listy „Słyszane w okolicy” albo dodaj go ręcznie.</div>';
  $('slots').textContent=`zajęte ${S.meters.length} z ${S.max_meters} miejsc`;
  const h=[...S.heard].sort((a,b)=>b.rssi-a.rssi);
- $('heard').innerHTML=h.map(x=>`<tr><td>${esc(x.mfct)}</td><td class="num">${x.id}</td><td>${esc(x.media)} <span class="mut">${x.driver}</span></td><td class="num">${x.rssi} dBm</td><td class="num">${x.count}</td><td>${ago(x.seen)}</td><td class="${x.status=='OK'?'ok':'mut'}">${esc(x.status)}</td><td><button onclick="addHeard('${x.id}','${x.mfct}')">Dodaj</button></td></tr>`).join('')||'<tr><td colspan="8" class="mut">Jeszcze nic nie odebrano.</td></tr>';
+ $('heard').innerHTML=h.map(x=>`<tr><td>${esc(x.mfct)}</td><td class="num">${x.id}</td><td>${esc(x.media)} <span class="mut">${x.driver}</span></td><td class="num">${x.rssi} dBm</td><td class="num">${x.count}</td><td>${ago(x.seen)}</td><td class="${x.status=='OK'?'ok':'mut'}">${esc(x.status)}</td><td class="row" style="flex-wrap:nowrap"><button onclick="addHeard('${x.id}','${x.mfct}')">Dodaj</button><button onclick="showFrame('${x.id}')">Ramka</button></td></tr>`).join('')||'<tr><td colspan="8" class="mut">Jeszcze nic nie odebrano.</td></tr>';
  if(!$('f_drv').options.length)$('f_drv').innerHTML=S.drivers.map(d=>`<option>${d}</option>`).join('');
 }
 async function sys(){
@@ -144,6 +150,19 @@ async function freset(){
  if(!confirm('Na pewno? Moduł straci połączenie z siecią i uruchomi hotspot konfiguracji.'))return;
  await fetch('/sihos16/api/factory_reset',{method:'POST'}).catch(()=>{});
  document.body.innerHTML='<main><div class="card"><h3>Przywrócono ustawienia fabryczne</h3><p>Moduł uruchamia się ponownie i włączy hotspot konfiguracji (dioda niebieska). Połącz się z nim, aby ustawić sieć WiFi.</p></div></main>';
+}
+async function showFrame(id){
+ let r;try{r=await (await fetch('/sihos16/api/frame?id='+id)).json()}catch(e){return}
+ $('frame').style.display='block';$('fr_t').textContent='Ramka licznika '+id+(r.hex?` (${r.hex.length/2} B, ${r.rssi} dBm)`:'');
+ $('fr_hex').value=r.hex||'Jeszcze nie odebrano ramki z tego licznika.';$('fr_m').textContent='';
+ $('fr_a').href='https://wmbusmeters.org/analyze/'+(r.hex||'');$('fr_a').style.display=r.hex?'':'none';
+ $('frame').scrollIntoView({behavior:'smooth'});
+}
+function copyFrame(){
+ const t=$('fr_hex');t.focus();t.select();let ok=false;
+ try{ok=document.execCommand('copy')}catch(e){}
+ if(!ok&&navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>$('fr_m').textContent='Skopiowano.');
+ $('fr_m').textContent=ok?'Skopiowano.':'Zaznaczono — skopiuj Ctrl+C.';
 }
 function openForm(slot){
  edit=slot===undefined?null:S.meters.find(m=>m.slot===slot);prev=null;

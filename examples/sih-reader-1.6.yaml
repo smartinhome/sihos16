@@ -21,6 +21,8 @@ esp32:
   flash_size: 4MB
   framework:
     type: esp-idf
+    advanced:
+      flash_chip: generic   # zalecenie ESPHome: mniej pamięci IRAM na obsługę pamięci flash
 
 logger:
   level: INFO   # DEBUG pokazuje też każdą ramkę i każde pole

@@ -469,6 +469,11 @@ void Sihos16::handle_frame_(const RadioFrame &f) {
   for (auto &e : this->heard_)
     if (e.addr.id == a.id && e.addr.mfct == a.mfct) h = &e;
   if (h == nullptr) {
+    // Nowy licznik w zasięgu: jedna linia INFO z ramką (do przesłania, gdy licznik jest nieobsługiwany).
+    char hex[2 * MAX_FRAME + 1];
+    for (size_t i = 0; i < f.len; i++) snprintf(hex + 2 * i, 3, "%02x", f.data[i]);
+    ESP_LOGI(TAG, "Nowy licznik w okolicy: %s %08" PRIx32 " (%s, %s), %d dBm: %s", mfct_str(a.mfct).c_str(), a.id,
+             media_str(r.media), status_str(r.status), f.rssi, hex);
     if (this->heard_.size() < MAX_HEARD) {
       this->heard_.emplace_back();
       h = &this->heard_.back();
@@ -569,6 +574,8 @@ void Sihos16::handleRequest(AsyncWebServerRequest *req) {
     this->handle_save_(req);
   } else if (url == "/sihos16/api/delete" && req->method() == HTTP_POST) {
     this->handle_delete_(req);
+  } else if (url == "/sihos16/api/frame") {
+    this->send_frame_(req);
   } else if (url == "/sihos16/api/system") {
     this->send_system_(req);
   } else if (url == "/sihos16/api/wifi" && req->method() == HTTP_POST) {
@@ -846,6 +853,38 @@ void Sihos16::handle_delete_(AsyncWebServerRequest *req) {
   this->pending_slot_ = slot;
   this->pending_save_ = true;
   req->send(200, "application/json", "{\"ok\":true}");
+}
+
+// Ostatnia ramka licznika w hex (bez CRC) — do skopiowania ze strony i przesłania do analizy.
+void Sihos16::send_frame_(AsyncWebServerRequest *req) {
+  uint32_t id = strtoul(req->arg("id").c_str(), nullptr, 16);
+  std::string o = "{\"hex\":\"";
+  int8_t rssi = 0;
+  {
+    LockGuard g(this->lock_);
+    const std::vector<uint8_t> *fr = nullptr;
+    for (int s = 0; s < MAX_METERS && fr == nullptr; s++)
+      if (this->cfg_[s].used && this->cfg_[s].id == id && !this->state_[s].frame.empty()) {
+        fr = &this->state_[s].frame;
+        rssi = this->state_[s].rssi;
+      }
+    for (size_t i = 0; i < this->heard_.size() && fr == nullptr; i++)
+      if (this->heard_[i].addr.id == id) {
+        fr = &this->heard_[i].frame;
+        rssi = this->heard_[i].rssi;
+      }
+    if (fr != nullptr) {
+      static const char H[] = "0123456789abcdef";
+      for (uint8_t b : *fr) {
+        o += H[b >> 4];
+        o += H[b & 0x0F];
+      }
+    }
+  }
+  o += "\"";
+  json_kn(o, "rssi", rssi);
+  o += '}';
+  req->send(200, "application/json", o.c_str());
 }
 
 void Sihos16::send_system_(AsyncWebServerRequest *req) {
