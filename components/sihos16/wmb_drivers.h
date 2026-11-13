@@ -32,6 +32,12 @@ struct Driver {
 // Sterownik o nazwie albo wykryty po adresie; nullptr = ogólny OMS.
 const Driver *find_driver(const char *name, const Address &a);
 
+// Poprawia adres z ramek, które kodują go niestandardowo (Diehl/Izar).
+void normalize_address(const uint8_t *frame, size_t len, Address &a);
+
+// Klucz publicznie znany dla danego producenta (Diehl OMS), gdy użytkownik nie podał swojego.
+bool default_key(const uint8_t *frame, size_t len, uint8_t key[16]);
+
 // Lista wszystkich (do strony konfiguracji).
 const Driver *const *all_drivers(size_t &count);
 

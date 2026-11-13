@@ -9,7 +9,7 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 | Krok | Zakres | Stan |
 |---|---|---|
 | 1 | Własny dekoder wM-Bus + testy na komputerze | ✅ |
-| 2 | Sterowniki formatów producenta: Izar, Apator 162, Hydrodigit | ⏳ |
+| 2 | Sterowniki formatów producenta: Izar, Apator 162, Hydrodigit | ✅ |
 | 3 | Radio CC1101 | ⏳ |
 | 4 | Komponent ESPHome: liczniki jako urządzenia w HA | ⏳ |
 | 5 | Strona konfiguracji w module | ⏳ |
@@ -20,7 +20,12 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 `components/sihos16/wmb_*` — własna implementacja EN 13757-3/-4 i OMS, bez kodu wmbusmeters.
 
 - **Jeden ogólny dekoder zamiast tabeli na każdy licznik.** Rekordy DIF/VIF są zamieniane na pola na podstawie znaczenia (wielkość, kierunek, taryfa, faza, zapis archiwalny). Pole dostaje stały klucz (`energy_backward_t1_kwh`) i polską nazwę zależną od nośnika („Energia oddana T1” dla prądu, „Przepływ wsteczny” dla wody).
-- **Sterowniki tylko tam, gdzie licznik odbiega od OMS** (format producenta, wady jak `609B` w Sanxingu).
+- **Sterowniki tylko tam, gdzie licznik odbiega od OMS** (`wmb_drivers.cpp`):
+  - `izar` — Diehl Izar/PRIOS (SAP, HYD, DME): dane LFSR z kluczem domyślnym albo własnym, numer z obudowy (np. `C21FA000711`), alarmy,
+  - `apator162` — stan licznika z rejestrów producenta,
+  - `hydrodigit` — bateria, przepływ wsteczny, data wycieku, 12 stanów miesięcznych,
+  - `sanxing` — znacznik `609B` zamiast `2F2F`.
+  - Diehl OMS bez podanego klucza: używany jest publicznie znany klucz producenta.
 - **Szyfrowanie:** AES-CBC tryb 5, tryb 7 (klucz z AES-CMAC i licznika z AFL), ELL AES-CTR (Kamstrup). Na ESP32 przez mbedTLS ze sprzętowym AES.
 - **Rozmiar:** ok. 27 kB kodu.
 
@@ -31,7 +36,7 @@ cd tests/host
 make test        # wymaga g++ i libssl-dev
 ```
 
-- `real_frames.json` — ramki z prawdziwych instalacji, sprawdzane pole po polu.
+- `real_frames.json` — ramki z prawdziwych instalacji (Sanxing, 12 liczników Izar, 4× Apator 162, 4× Hydrodigit), sprawdzane pole po polu.
 - `vectors.json` — telegramy testowe z [wmbusmeters](https://github.com/wmbusmeters/wmbusmeters) (GPL-3.0), wyciągnięte skryptem `extract_xmq.py`. Porównywane są wartości, nie nazwy pól.
 
 ## Licencja

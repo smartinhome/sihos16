@@ -33,5 +33,709 @@
   "name": "Sanxing bez klucza",
   "telegram": "9e440cae4077157201027af10090050879575b4a27181e113d4e03510cdded80162bb4f038f5d022dd4b1f894bc6d10f816918d86155ad0c63bb0a1ea1994ecafc90a9324ba0d31f984d8991fdec4fb95f96577dffb8b9d99794736901f5cc244db87cf84753dc3d950eef03496bf6a31138106f3f68c0bb5f0e1e2b3f549dfdcf3754d6ad3f33cf93a4cda45c0ba267daa21b25dc892603d0da802cfcd584",
   "status": "brak klucza"
+ },
+ {
+  "name": "izar 21407207 (instalacja)",
+  "telegram": "1944304c077240219801a2011e001360f516f312ab19ff5369ad",
+  "fields": {
+   "volume_s1_m3": 445.091,
+   "battery_days": 5475,
+   "volume_m3": 445.295,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2021",
+   "alarms_previous": "brak",
+   "fabrication_no": "C21FA000711"
+  }
+ },
+ {
+  "name": "izar 21407207 (instalacja)",
+  "telegram": "1944304c077240219801a2111e001360e239bab98aca268870af",
+  "fields": {
+   "volume_s1_m3": 445.091,
+   "battery_days": 5475,
+   "volume_m3": 445.295,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2021",
+   "alarms_previous": "brak",
+   "fabrication_no": "C21FA000711"
+  }
+ },
+ {
+  "name": "izar 21407207 (instalacja)",
+  "telegram": "1944304c077240219801a2211e001360db486044e8be4ce55ba8",
+  "fields": {
+   "volume_s1_m3": 445.091,
+   "battery_days": 5475,
+   "volume_m3": 445.295,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2021",
+   "alarms_previous": "brak",
+   "fabrication_no": "C21FA000711"
+  }
+ },
+ {
+  "name": "izar 416f242d (instalacja)",
+  "telegram": "1944304c2d246f419801a201190013e9fb958f2723bdb51959de",
+  "fields": {
+   "volume_s1_m3": 175.157,
+   "battery_days": 4562.5,
+   "volume_m3": 176.92,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2024",
+   "alarms_previous": "brak",
+   "fabrication_no": "C24FB060973"
+  }
+ },
+ {
+  "name": "izar 416f242d (instalacja)",
+  "telegram": "1944304c2d246f419801a211190013e9ecbac68c026e6cc240dc",
+  "fields": {
+   "volume_s1_m3": 175.157,
+   "battery_days": 4562.5,
+   "volume_m3": 176.92,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2024",
+   "alarms_previous": "brak",
+   "fabrication_no": "C24FB060973"
+  }
+ },
+ {
+  "name": "izar 416f242d (instalacja)",
+  "telegram": "1944304c2d246f419801a221190013e9d5cb1c71601a06af6bdb",
+  "fields": {
+   "volume_s1_m3": 175.157,
+   "battery_days": 4562.5,
+   "volume_m3": 176.92,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2024",
+   "alarms_previous": "brak",
+   "fabrication_no": "C24FB060973"
+  }
+ },
+ {
+  "name": "izar 217ef139 (instalacja)",
+  "telegram": "1944304c39f17e219801a2011b001349682def8eb8b90bd0883e",
+  "fields": {
+   "volume_s1_m3": 127.724,
+   "battery_days": 4927.5,
+   "volume_m3": 137.403,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096505"
+  }
+ },
+ {
+  "name": "izar 217ef139 (instalacja)",
+  "telegram": "1944304c39f17e219801a2111b0013497f02a625996ad20b913c",
+  "fields": {
+   "volume_s1_m3": 127.724,
+   "battery_days": 4927.5,
+   "volume_m3": 137.403,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096505"
+  }
+ },
+ {
+  "name": "izar 217ef139 (instalacja)",
+  "telegram": "1944304c39f17e219801a2211b00134946737cd8fb1eb866ba3b",
+  "fields": {
+   "volume_s1_m3": 127.724,
+   "battery_days": 4927.5,
+   "volume_m3": 137.403,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096505"
+  }
+ },
+ {
+  "name": "izar 217ef13c (instalacja)",
+  "telegram": "1944304c3cf17e219801a2011b001302febf520e5f32d5666b37",
+  "fields": {
+   "volume_s1_m3": 114.023,
+   "battery_days": 4927.5,
+   "volume_m3": 123.327,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096508"
+  }
+ },
+ {
+  "name": "izar 217ef13c (instalacja)",
+  "telegram": "1944304c3cf17e219801a2111b001302e9901ba57ee10cbd7235",
+  "fields": {
+   "volume_s1_m3": 114.023,
+   "battery_days": 4927.5,
+   "volume_m3": 123.327,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096508"
+  }
+ },
+ {
+  "name": "izar 217ef13c (instalacja)",
+  "telegram": "1944304c3cf17e219801a2211b001302d0e1c1581c9566d05932",
+  "fields": {
+   "volume_s1_m3": 114.023,
+   "battery_days": 4927.5,
+   "volume_m3": 123.327,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096508"
+  }
+ },
+ {
+  "name": "izar 217ef142 (instalacja)",
+  "telegram": "1944304c42f17e219801a2011b0013c98b7284a7d6d44b94d060",
+  "fields": {
+   "volume_s1_m3": 104.515,
+   "battery_days": 4927.5,
+   "volume_m3": 114.003,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096514"
+  }
+ },
+ {
+  "name": "izar 217ef142 (instalacja)",
+  "telegram": "1944304c42f17e219801a2211b0013c9a12c17f19573f822e265",
+  "fields": {
+   "volume_s1_m3": 104.515,
+   "battery_days": 4927.5,
+   "volume_m3": 114.007,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096514"
+  }
+ },
+ {
+  "name": "izar 217ef142 (instalacja)",
+  "telegram": "1944304c42f17e219801a2311b0013c9b9035e5ab4a021f9fb67",
+  "fields": {
+   "volume_s1_m3": 104.515,
+   "battery_days": 4927.5,
+   "volume_m3": 114.008,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096514"
+  }
+ },
+ {
+  "name": "izar 217ef147 (instalacja)",
+  "telegram": "1944304c47f17e219801a2011b001382dc2c3b2786f194223369",
+  "fields": {
+   "volume_s1_m3": 31.103,
+   "battery_days": 4927.5,
+   "volume_m3": 34.966,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096519"
+  }
+ },
+ {
+  "name": "izar 217ef147 (instalacja)",
+  "telegram": "1944304c47f17e219801a2111b001382cb03728ca7224df92a6b",
+  "fields": {
+   "volume_s1_m3": 31.103,
+   "battery_days": 4927.5,
+   "volume_m3": 34.966,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096519"
+  }
+ },
+ {
+  "name": "izar 217ef147 (instalacja)",
+  "telegram": "1944304c47f17e219801a2211b001382f272a871c5562794016c",
+  "fields": {
+   "volume_s1_m3": 31.103,
+   "battery_days": 4927.5,
+   "volume_m3": 34.966,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096519"
+  }
+ },
+ {
+  "name": "izar 215f1155 (instalacja)",
+  "telegram": "1944304c55115f219801a2011700136a881b896f15b5a9d83c8b",
+  "fields": {
+   "volume_s1_m3": 685.662,
+   "battery_days": 4197.5,
+   "volume_m3": 697.55,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-06-30",
+   "manufacture_year": "2023",
+   "alarms_previous": "brak",
+   "fabrication_no": "C23FA007573"
+  }
+ },
+ {
+  "name": "izar 215f1155 (instalacja)",
+  "telegram": "1944304c55115f219801a2011700136af605886fb974a8d83d87",
+  "fields": {
+   "volume_s1_m3": 767.986,
+   "battery_days": 4197.5,
+   "volume_m3": 768.688,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2023",
+   "alarms_previous": "brak",
+   "fabrication_no": "C23FA007573"
+  }
+ },
+ {
+  "name": "izar 215f1155 (instalacja)",
+  "telegram": "1944304c55115f219801a2111700136a9f34c0c4346670032589",
+  "fields": {
+   "volume_s1_m3": 685.662,
+   "battery_days": 4197.5,
+   "volume_m3": 697.55,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-06-30",
+   "manufacture_year": "2023",
+   "alarms_previous": "brak",
+   "fabrication_no": "C23FA007573"
+  }
+ },
+ {
+  "name": "izar 4122b274 (instalacja)",
+  "telegram": "1944304c74b22241cc01a201060013c2dbe56b8dc038c596302f",
+  "fields": {
+   "volume_s1_m3": 814.176,
+   "battery_days": 1095,
+   "volume_m3": 816.351,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2019",
+   "alarms_previous": "brak",
+   "fabrication_no": "C19SB051124"
+  }
+ },
+ {
+  "name": "izar 4122b274 (instalacja)",
+  "telegram": "1944304c74b22241cc01a221060013c2f5bbf8db839f7620022a",
+  "fields": {
+   "volume_s1_m3": 814.176,
+   "battery_days": 1095,
+   "volume_m3": 816.351,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2019",
+   "alarms_previous": "brak",
+   "fabrication_no": "C19SB051124"
+  }
+ },
+ {
+  "name": "izar 4122b274 (instalacja)",
+  "telegram": "1944304c74b22241cc01a231060013c2e294b170a24caffb1b28",
+  "fields": {
+   "volume_s1_m3": 814.176,
+   "battery_days": 1095,
+   "volume_m3": 816.351,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2019",
+   "alarms_previous": "brak",
+   "fabrication_no": "C19SB051124"
+  }
+ },
+ {
+  "name": "izar 417def88 (instalacja)",
+  "telegram": "1944304c88ef7d419801a2011900132e8ce5414af3142cb2c72c",
+  "fields": {
+   "volume_s1_m3": 142.453,
+   "battery_days": 4562.5,
+   "volume_m3": 146.639,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FB030536"
+  }
+ },
+ {
+  "name": "izar 417def88 (instalacja)",
+  "telegram": "1944304c88ef7d419801a2111900132e9bca08e1d2c7f569de2e",
+  "fields": {
+   "volume_s1_m3": 142.453,
+   "battery_days": 4562.5,
+   "volume_m3": 146.639,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FB030536"
+  }
+ },
+ {
+  "name": "izar 417def88 (instalacja)",
+  "telegram": "1944304c88ef7d419801a2211900132ea2bbd21cb0b39f04f529",
+  "fields": {
+   "volume_s1_m3": 142.453,
+   "battery_days": 4562.5,
+   "volume_m3": 146.639,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-10-31",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FB030536"
+  }
+ },
+ {
+  "name": "izar 217eaebd (instalacja)",
+  "telegram": "1944304cbdae7e219801a2011b00133feeaba3fe28fa3b369c8e",
+  "fields": {
+   "volume_s1_m3": 121.377,
+   "battery_days": 4927.5,
+   "volume_m3": 133.051,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA079485"
+  }
+ },
+ {
+  "name": "izar 217eaebd (instalacja)",
+  "telegram": "1944304cbdae7e219801a2111b00133ff984ea550929e2ed858c",
+  "fields": {
+   "volume_s1_m3": 121.377,
+   "battery_days": 4927.5,
+   "volume_m3": 133.051,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA079485"
+  }
+ },
+ {
+  "name": "izar 217eaebd (instalacja)",
+  "telegram": "1944304cbdae7e219801a2411b00133fb2168552afb55c5af884",
+  "fields": {
+   "volume_s1_m3": 121.377,
+   "battery_days": 4927.5,
+   "volume_m3": 133.051,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA079485"
+  }
+ },
+ {
+  "name": "izar 217ef1c3 (instalacja)",
+  "telegram": "1944304cc3f17e219801a2111b0013de4d336e94c8f3caa58ea8",
+  "fields": {
+   "volume_s1_m3": 67.948,
+   "battery_days": 4927.5,
+   "volume_m3": 74.413,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096643"
+  }
+ },
+ {
+  "name": "izar 217ef1c3 (instalacja)",
+  "telegram": "1944304cc3f17e219801a2211b0013de7442b469aa87a0c8a5af",
+  "fields": {
+   "volume_s1_m3": 67.948,
+   "battery_days": 4927.5,
+   "volume_m3": 74.413,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096643"
+  }
+ },
+ {
+  "name": "izar 217ef1c3 (instalacja)",
+  "telegram": "1944304cc3f17e219801a2411b0013de06a101936e6f7412f3a0",
+  "fields": {
+   "volume_s1_m3": 67.948,
+   "battery_days": 4927.5,
+   "volume_m3": 74.413,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096643"
+  }
+ },
+ {
+  "name": "izar 217ef1c8 (instalacja)",
+  "telegram": "1944304cc8f17e219801a2011b00135edab182eac7c56937cebb",
+  "fields": {
+   "volume_s1_m3": 3.794,
+   "battery_days": 4927.5,
+   "volume_m3": 4.134,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096648"
+  }
+ },
+ {
+  "name": "izar 217ef1c8 (instalacja)",
+  "telegram": "1944304cc8f17e219801a2111b00135ecd9ecb41e616b0ecd7b9",
+  "fields": {
+   "volume_s1_m3": 3.794,
+   "battery_days": 4927.5,
+   "volume_m3": 4.134,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096648"
+  }
+ },
+ {
+  "name": "izar 217ef1c8 (instalacja)",
+  "telegram": "1944304cc8f17e219801a2211b00135ef4ef11bc8462da81fcbe",
+  "fields": {
+   "volume_s1_m3": 3.794,
+   "battery_days": 4927.5,
+   "volume_m3": 4.134,
+   "transmit_period_s": 8,
+   "alarms": "brak",
+   "date_s1": "2026-09-30",
+   "manufacture_year": "2025",
+   "alarms_previous": "brak",
+   "fabrication_no": "C25FA096648"
+  }
+ },
+ {
+  "name": "hydrodigit 23746391 (instalacja)",
+  "telegram": "2144b4099163742315077a400000000c1399999999046d092a30340f050b01000000",
+  "fields": {
+   "volume_backward_m3": 0.001,
+   "datetime": "2025-04-16 10:09",
+   "volume_m3": 99999.999,
+   "battery_voltage_v": 3.2
+  }
+ },
+ {
+  "name": "hydrodigit 03245501 (instalacja)",
+  "telegram": "2444b4090155240317068c00487ac00000000c1335670000046d172eea280f030000000000",
+  "fields": {
+   "datetime": "2023-08-10 14:23",
+   "volume_m3": 6.735,
+   "battery_voltage_v": 3.7
+  }
+ },
+ {
+  "name": "apator162 07137214 (instalacja)",
+  "telegram": "3e4401061472130705077a69003085904af3be5b7e6919782e8959c87ad23ac1e8fb1f5b7de4cdb979b140d4de498456857d8557fa576fc440cbd8b6744bb7",
+  "fields": {
+   "volume_m3": 437.717
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 07137214 (instalacja)",
+  "telegram": "3e4401061472130705077a6a0030854076ed000ada231f5a37a09c17facd9f2de2d3d42218f6d32022030a4ec39ef5b597f7e791e444e67c903ec2d79b1afe",
+  "fields": {
+   "volume_m3": 437.717
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 07137214 (instalacja)",
+  "telegram": "3e4401061472130705077a6b0030852728c9d2a45bf944e4e9c9f4d1b7d7bcd1379f4a50656f28a72f429bcb8944a4da11b04e4ab30d895ff7ce5d33a05804",
+  "fields": {
+   "volume_m3": 437.717
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 07135933 (instalacja)",
+  "telegram": "3e4401063359130705077a70003085f436312f13eaf6c429c6e0f22697b903f79bec29f34ec243283fc5e9df5e81f1bbedc2b2c9eb5b9dc9c26d528dccda3d",
+  "fields": {
+   "volume_m3": 279.847
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 07135933 (instalacja)",
+  "telegram": "3e4401063359130705077a7100308508b9ce4691bfac355dca3538f083aa951f9353ecabb648235f07191e514817db719250d2a2e624641f3222d2c4cc7907",
+  "fields": {
+   "volume_m3": 279.847
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 07135933 (instalacja)",
+  "telegram": "3e4401063359130705077a7200308504c4d6b8d08eae0097b814c85000f4d5e1e51be826fdde822954ce9ac95c58771a822976601753706442f752de9b24c2",
+  "fields": {
+   "volume_m3": 279.847
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 02841261 (instalacja)",
+  "telegram": "3e4401066112840205077a8a003085954244b10b3a41ea4ab44a0c4a76f7f851e483fbb80f6101e78602156f27e784e685890b3c06e7552605e1165ef216c3",
+  "fields": {
+   "volume_m3": 60.436
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 02841261 (instalacja)",
+  "telegram": "3e4401066112840205077a8b003085cad3eade4a7c0c4681ec3d75b21a32dfb3005b950763ce9a5171fa51547929eb9eaa9af6fa2ff1b8464af6d7114512bc",
+  "fields": {
+   "volume_m3": 60.436
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 02841261 (instalacja)",
+  "telegram": "3e4401066112840205077a8c003085ced79fcd058f96a56f5b5daec9dd9074ee7b8e993919ba7f67264e5012c789f9195e29e0f5e40309d634bf948569d49b",
+  "fields": {
+   "volume_m3": 60.436
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "hydrodigit 03122061 (instalacja)",
+  "telegram": "4c44b4096120120317077ab90000000c1330000000046d132e3e360f8f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "fields": {
+   "volume_backward_m3": 0,
+   "datetime": "2025-06-30 14:19",
+   "volume_m3": 0.03,
+   "battery_voltage_v": 3.7,
+   "leak_date": "brak"
+  }
+ },
+ {
+  "name": "hydrodigit 19199688 (instalacja)",
+  "telegram": "4e44b4098896191913077abe084005e8f09c3ec92ad8fe186474aa431d62e9f713bc1c0fd4befc5c6fa28bdae8daf1460b5f3977f3360ffd474b66848f6024ad3f072ae7dc3025a32646913b26a255",
+  "fields": {
+   "volume_month_04_m3": 244.23,
+   "volume_month_08_m3": 244.23,
+   "volume_month_12_m3": 244.23,
+   "volume_month_02_m3": 244.23,
+   "volume_month_01_m3": 244.23,
+   "volume_month_07_m3": 244.23,
+   "volume_month_06_m3": 244.23,
+   "volume_month_03_m3": 244.23,
+   "volume_month_05_m3": 244.23,
+   "volume_month_11_m3": 244.23,
+   "volume_month_10_m3": 244.23,
+   "volume_month_09_m3": 244.23,
+   "volume_backward_m3": 0.006,
+   "datetime": "2026-10-27 09:00",
+   "volume_m3": 244.241,
+   "battery_voltage_v": 3.7
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "hydrodigit 19199688 (instalacja)",
+  "telegram": "4e44b4098896191913077ac80840050a76b4717ef0caa7d7bf229ce369c9191c06111a11e3bf6c396f312318322d7137b08643eee30ca720b65e1b7575b71cfe4f252fe8886ddd9f8f4bdedfbadb11",
+  "fields": {
+   "volume_month_04_m3": 244.23,
+   "volume_month_08_m3": 244.23,
+   "volume_month_12_m3": 244.23,
+   "volume_month_02_m3": 244.23,
+   "volume_month_01_m3": 244.23,
+   "volume_month_07_m3": 244.23,
+   "volume_month_06_m3": 244.23,
+   "volume_month_03_m3": 244.23,
+   "volume_month_05_m3": 244.23,
+   "volume_month_11_m3": 244.23,
+   "volume_month_10_m3": 244.22,
+   "volume_month_09_m3": 244.23,
+   "volume_backward_m3": 0.102,
+   "datetime": "2026-11-02 11:56",
+   "volume_m3": 244.22,
+   "battery_voltage_v": 3.7
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 01151836 (instalacja)",
+  "telegram": "6e4401063618150105077ac60060850c9bc5d651bcc054d283470e676c55d6821a3c972efe1923259381eba512b689dda15f05ee113902bf47adaa08fab059e3fb0f8bf688877714d4df2f3812d08282fcecddccb3a7adb912ebfc81e0897da170c611104df27435e26dfe30d0976f",
+  "fields": {
+   "volume_m3": 52.385
+  },
+  "key": "00000000000000000000000000000000"
+ },
+ {
+  "name": "apator162 01151836 (instalacja)",
+  "telegram": "6e4401063618150105077ac7006085510c04d31a0b8627ab47786ef55918318784f4624b89ca6766c46d86f10f3eaef802972daad7dc3e960dbe42ef82fdf44ee80171bdbad07abdcb90ae8a45bb361fd8f346cf84e917d447fcd5ad40d800656026f8081e976c7e1dc5f90a916d4d",
+  "fields": {
+   "volume_m3": 52.385
+  },
+  "key": "00000000000000000000000000000000"
  }
 ]

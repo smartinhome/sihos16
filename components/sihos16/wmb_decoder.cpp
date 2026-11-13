@@ -147,6 +147,7 @@ bool peek_address(const uint8_t *f, size_t len, Address &a) {
   a.id = rd32(f + 4);
   a.version = f[8];
   a.type = f[9];
+  normalize_address(f, len, a);
   return true;
 }
 
@@ -165,6 +166,9 @@ Result decode(const uint8_t *frame, size_t len, const uint8_t *key, const char *
 
   const Driver *drv = find_driver(driver_name, res.addr);
   if (drv) res.driver = drv->name;
+  const bool user_key = key != nullptr;
+  uint8_t mfct_key[16];
+  if (!key && default_key(f.data(), len, mfct_key)) key = mfct_key;
 
   size_t pos = 10;
   uint8_t ci = f[pos++];
@@ -268,7 +272,7 @@ Result decode(const uint8_t *frame, size_t len, const uint8_t *key, const char *
     size_t enc_len = blocks * 16;
     if (pos > len) return res.status = Status::TOO_SHORT, res;
     if (enc_len == 0 || pos + enc_len > len) enc_len = ((len - pos) / 16) * 16;
-    bool already_plain = !key && enc_len >= 2 && f[pos] == 0x2F && f[pos + 1] == 0x2F;
+    bool already_plain = !user_key && enc_len >= 2 && f[pos] == 0x2F && f[pos + 1] == 0x2F;
     if (!already_plain) {
       if (!key) return res.status = Status::NO_KEY, res;
       uint8_t iv[16] = {0};
