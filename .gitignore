@@ -2,3 +2,6 @@ tests/host/decode_cli
 __pycache__/
 *.pyc
 .esphome/
+tests/esp/.esphome/
+tests/esp/*-ci.yaml
+tests/host/link_cli

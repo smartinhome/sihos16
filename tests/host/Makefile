@@ -4,10 +4,13 @@ CXXFLAGS := -std=gnu++20 -O1 -g -Wall -Wextra -Werror -DSIHOS_HOST -I../../compo
 decode_cli: decode_cli.cpp $(SRC) $(wildcard ../../components/sihos16/wmb_*.h)
 	$(CXX) $(CXXFLAGS) -o $@ decode_cli.cpp $(SRC) -lcrypto
 
-test: decode_cli
+link_cli: link_cli.cpp ../../components/sihos16/wmb_link.cpp ../../components/sihos16/wmb_link.h
+	$(CXX) $(CXXFLAGS) -o $@ link_cli.cpp ../../components/sihos16/wmb_link.cpp
+
+test: decode_cli link_cli
 	python3 run_tests.py
 
 clean:
-	rm -f decode_cli
+	rm -f decode_cli link_cli
 
 .PHONY: test clean

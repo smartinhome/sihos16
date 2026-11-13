@@ -1,0 +1,38 @@
+# Test kroku 3: radio CC1101 + dekoder. Liczniki jeszcze nie są konfigurowane — moduł loguje wszystko, co słyszy.
+esphome:
+  name: sihos16-test
+  friendly_name: SIHOS16 test
+
+esp32:
+  board: lolin_s3_mini
+  variant: ESP32S3
+  cpu_frequency: 160MHz
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+api:
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: test
+  password: testtest
+
+external_components:
+  - source:
+      type: local
+      path: ../../components
+
+spi:
+  clk_pin: GPIO12
+  mosi_pin: GPIO11
+  miso_pin: GPIO13
+
+sihos16:
+  cs_pin: GPIO10
+  gdo0_pin: GPIO21
+  gdo2_pin: GPIO14

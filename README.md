@@ -10,7 +10,7 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 |---|---|---|
 | 1 | Własny dekoder wM-Bus + testy na komputerze | ✅ |
 | 2 | Sterowniki formatów producenta: Izar, Apator 162, Hydrodigit | ✅ |
-| 3 | Radio CC1101 | ⏳ |
+| 3 | Radio CC1101 | ✅ (do sprawdzenia na module) |
 | 4 | Komponent ESPHome: liczniki jako urządzenia w HA | ⏳ |
 | 5 | Strona konfiguracji w module | ⏳ |
 | 6 | Diody, minimalny YAML, kompilacja | ⏳ |
@@ -29,6 +29,17 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 - **Szyfrowanie:** AES-CBC tryb 5, tryb 7 (klucz z AES-CMAC i licznika z AFL), ELL AES-CTR (Kamstrup). Na ESP32 przez mbedTLS ze sprzętowym AES.
 - **Rozmiar:** ok. 27 kB kodu.
 
+## Radio
+
+`components/sihos16/radio_cc1101.*` — odbiór T1/C1 (formaty A i B) na CC1101, maszyna stanów przeniesiona z `smartinhome/esphome-components`.
+
+- Osobne zadanie FreeRTOS (priorytet 3, rdzeń 1) budzone przerwaniami GDO0 (próg FIFO) i GDO2 (synchronizacja) — długie operacje w pętli ESPHome nie gubią ramek.
+- RSSI mierzone w chwili synchronizacji, a nie po odebraniu ramki.
+- CRC sprawdzane już w radiu (`wmb_link.*`): do dekodera trafiają tylko poprawne ramki, szum jest liczony i odrzucany.
+- Kolejka 8 ramek, pętla opróżnia ją w całości; co minutę statystyka w logu.
+
+Test na module: `examples/krok3-test-radia.yaml`.
+
 ## Testy na komputerze
 
 ```bash
@@ -37,6 +48,7 @@ make test        # wymaga g++ i libssl-dev
 ```
 
 - `real_frames.json` — ramki z prawdziwych instalacji (Sanxing, 12 liczników Izar, 4× Apator 162, 4× Hydrodigit), sprawdzane pole po polu.
+- `link_frames.json` — surowe pakiety radiowe (z CRC) z logów SIH Reader: sprawdzanie CRC musi dać to samo co stary fork, a szum odrzucić.
 - `vectors.json` — telegramy testowe z [wmbusmeters](https://github.com/wmbusmeters/wmbusmeters) (GPL-3.0), wyciągnięte skryptem `extract_xmq.py`. Porównywane są wartości, nie nazwy pól.
 
 ## Licencja

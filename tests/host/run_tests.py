@@ -106,7 +106,90 @@ def wmbusmeters_vectors(verbose):
     return found, total
 
 
+# ---------- warstwa łącza ----------
+
+ENC = [0b010110, 0b001101, 0b001110, 0b001011, 0b011100, 0b011001, 0b011010, 0b010011,
+       0b101100, 0b100101, 0b100110, 0b100011, 0b110100, 0b110001, 0b110010, 0b101001]
+
+
+def crc16(data):
+    crc = 0
+    for b in data:
+        crc ^= b << 8
+        for _ in range(8):
+            crc = ((crc << 1) ^ 0x3D65) if crc & 0x8000 else crc << 1
+            crc &= 0xFFFF
+    return crc ^ 0xFFFF
+
+
+def add_crc_a(frame):
+    out, i, block = b"", 0, 10
+    while i < len(frame):
+        part = frame[i:i + block]
+        out += part + crc16(part).to_bytes(2, "big")
+        i += len(part)
+        block = 16
+    return out
+
+
+def add_crc_b(frame):
+    # L w formacie B liczy CRC
+    n = len(frame) - 1
+    total = n + (2 if len(frame) <= 126 else 4)
+    f = bytes([total]) + frame[1:]
+    if len(f) <= 126:
+        return f + crc16(f).to_bytes(2, "big")
+    b12, b3 = f[:126], f[126:]
+    return b12 + crc16(b12).to_bytes(2, "big") + b3 + crc16(b3).to_bytes(2, "big")
+
+
+def enc_3of6(data):
+    bits = "".join(f"{ENC[b >> 4]:06b}{ENC[b & 15]:06b}" for b in data)
+    bits += "0" * (-len(bits) % 8)
+    return bytes(int(bits[i:i + 8], 2) for i in range(0, len(bits), 8))
+
+
+def link_tests():
+    cli = HERE / "link_cli"
+    cases = []  # (operacja, wejście hex, oczekiwane hex albo FAIL, opis)
+    real = json.loads((HERE / "link_frames.json").read_text())
+    for r in real:
+        cases.append(("crcA", r["raw"], None, r["frame"]))
+    frames = [bytes.fromhex(t["telegram"]) for t in json.loads((HERE / "real_frames.json").read_text())]
+    frames = [f[:f[0] + 1] for f in frames]
+    for f in frames:
+        a = add_crc_a(f)
+        cases.append(("crcA", a.hex(), f.hex(), "A"))
+        cases.append(("crcB", add_crc_b(f).hex(), f.hex(), "B"))
+        cases.append(("3of6", enc_3of6(a).hex(), a.hex(), "3of6"))
+        bad = bytearray(a)
+        bad[len(bad) // 2] ^= 0x10
+        cases.append(("crcA", bytes(bad).hex(), "FAIL", "A zepsuty"))
+    p = subprocess.run([str(cli)], input="\n".join(f"{o} {h}" for o, h, _, _ in cases),
+                       capture_output=True, text=True)
+    outs = p.stdout.split()
+    ok = bad_n = real_ok = real_fail = 0
+    for (op, h, want, desc), got in zip(cases, outs):
+        if want is None:  # ramki z logów: wynik ma się zgadzać z ucięciem w logu, szum może nie przejść CRC
+            if got == "FAIL":
+                real_fail += 1
+            elif desc.startswith(got[:len(desc)]) or got.startswith(desc):
+                real_ok += 1
+            else:
+                bad_n += 1
+                print("BŁĄD log:", h[:40], got[:40], desc[:40])
+            continue
+        if got == want:
+            ok += 1
+        else:
+            bad_n += 1
+            print("BŁĄD", desc, h[:40], got[:40])
+    print(f"łącze: syntetyczne {ok}/{ok + bad_n - 0} OK; z logów zgodne {real_ok}, odrzucone CRC {real_fail}")
+    return bad_n == 0
+
+
 if __name__ == "__main__":
-    ok = real_frames()
+    ok = link_tests()
+    ok &= real_frames()
     wmbusmeters_vectors("-v" in sys.argv)
     sys.exit(0 if ok else 1)
