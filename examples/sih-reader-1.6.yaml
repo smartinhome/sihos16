@@ -76,6 +76,7 @@ sihos16:
   status_led: led_ramki
   factory_reset_pin:        # przycisk BOOT: przytrzymanie 10 s = ustawienia fabryczne
     number: GPIO0
+    ignore_strapping_warning: true   # GPIO0 to przycisk BOOT płytki — tylko odczyt, bezpieczne
     inverted: true
     mode:
       input: true
