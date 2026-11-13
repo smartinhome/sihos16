@@ -550,9 +550,15 @@ bool Sihos16::canHandle(AsyncWebServerRequest *request) const {
   return false;
 }
 
-void Sihos16::handleRequest(AsyncWebServerRequest *req) {
+// Bufor adresu (513 B) tylko w tej funkcji — nie zostaje na stosie podczas obsługi żądania.
+static std::string __attribute__((noinline)) request_url(AsyncWebServerRequest *req) {
   char buf[AsyncWebServerRequest::URL_BUF_SIZE];
-  std::string url = req->url_to(buf).str();
+  return req->url_to(buf).str();
+}
+
+void Sihos16::handleRequest(AsyncWebServerRequest *req) {
+  // Uwaga: zadanie serwera WWW ma tylko ok. 4,5 kB stosu — duże struktury trzymamy w polach klasy.
+  std::string url = request_url(req);
   if (url == "/" || url == "/sihos16" || url == "/sihos16/") {
     req->send(200, "text/html; charset=utf-8", PAGE_HTML);
   } else if (url == "/sihos16/api/state") {
@@ -743,7 +749,9 @@ void Sihos16::send_preview_(AsyncWebServerRequest *req) {
 void Sihos16::handle_save_(AsyncWebServerRequest *req) {
   int slot = req->hasArg("slot") ? atoi(req->arg("slot").c_str()) : -1;
   std::string key_s = req->arg("key"), mf = req->arg("mfct"), drv = req->arg("driver"), fields = req->arg("fields");
-  MeterConfig c{};
+  LockGuard g(this->lock_);
+  MeterConfig &c = this->work_cfg_;  // 1,6 kB — nie na stosie zadania serwera WWW
+  memset(&c, 0, sizeof c);
   c.used = 1;
   c.id = strtoul(req->arg("id").c_str(), nullptr, 16);
   if (mf.size() == 3) c.mfct = mfct_code(mf.c_str());
@@ -751,7 +759,6 @@ void Sihos16::handle_save_(AsyncWebServerRequest *req) {
   if (c.name[0] == 0) snprintf(c.name, sizeof c.name, "Licznik %08" PRIx32, c.id);
   copy_str(c.driver, sizeof c.driver, drv.empty() ? std::string("auto") : drv);
 
-  LockGuard g(this->lock_);
   if (slot < 0 || slot >= MAX_METERS) {
     slot = -1;
     for (int s = 0; s < MAX_METERS && slot < 0; s++)
@@ -835,7 +842,7 @@ void Sihos16::handle_delete_(AsyncWebServerRequest *req) {
     return;
   }
   LockGuard g(this->lock_);
-  this->pending_cfg_ = MeterConfig{};
+  memset(&this->pending_cfg_, 0, sizeof this->pending_cfg_);
   this->pending_slot_ = slot;
   this->pending_save_ = true;
   req->send(200, "application/json", "{\"ok\":true}");

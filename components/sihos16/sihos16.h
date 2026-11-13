@@ -158,6 +158,7 @@ class Sihos16 : public Component, public SpiDev, public AsyncWebHandler {
   bool pending_save_{false};
   int pending_slot_{-1};
   MeterConfig pending_cfg_{};
+  MeterConfig work_cfg_{};  // budowana przez stronę (zadanie serwera WWW ma mały stos)
   uint32_t reboot_at_{0};
 
 #ifdef USE_LIGHT
