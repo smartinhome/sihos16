@@ -132,6 +132,7 @@ class Sihos16 : public Component, public SpiDev, public AsyncWebHandler {
   InternalGPIOPin *gdo2_{nullptr};
   float mhz_{868.95f};
   web_server_base::WebServerBase *web_base_{nullptr};
+  bool web_started_{false};
 
   Cc1101 radio_;
   QueueHandle_t queue_{nullptr};

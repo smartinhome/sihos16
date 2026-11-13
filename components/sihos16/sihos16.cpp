@@ -140,6 +140,10 @@ void Sihos16::setup() {
   this->load_meters_();
   this->bind_entities_();
 
+  // Tylko zapamiętanie handlera (bez sieci). Rejestracja przed portalem ESPHome: w trybie hotspotu
+  // pierwszeństwo ma nasza strona.
+  if (this->web_base_ != nullptr) this->web_base_->add_handler(this);
+
   this->led_pref_ = global_preferences->make_preference<LedConfig>(fnv1_hash("sihos16_leds_v1"), true);
   LedConfig lc;
   if (this->led_pref_.load(&lc) && lc.version == 1) this->leds_ = lc;
@@ -147,11 +151,6 @@ void Sihos16::setup() {
 #ifdef USE_OUTPUT
   if (this->status_led_ != nullptr) this->status_led_->turn_off();
 #endif
-
-  if (this->web_base_ != nullptr) {
-    this->web_base_->init();
-    this->web_base_->add_handler(this);
-  }
 
   this->gdo0_->setup();
   this->gdo0_->pin_mode(gpio::FLAG_INPUT | gpio::FLAG_PULLDOWN);
@@ -268,6 +267,12 @@ void Sihos16::radio_task_(void *arg) {
 
 void Sihos16::loop() {
   uint32_t now = millis();
+  // Serwer WWW dopiero po starcie wszystkich komponentów: wcześniej nie ma jeszcze stosu sieciowego
+  // (httpd_start przed WiFi kończy się abort()).
+  if (!this->web_started_ && this->web_base_ != nullptr) {
+    this->web_started_ = true;
+    this->web_base_->init();
+  }
   if (this->queue_ != nullptr) {
     while (xQueueReceive(this->queue_, &this->frame_, 0) == pdTRUE) this->handle_frame_(this->frame_);
     if (now - this->last_stats_ms_ >= STATS_EVERY_MS) {
