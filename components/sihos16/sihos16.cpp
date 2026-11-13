@@ -7,6 +7,14 @@
 #include <cstring>
 
 #include "esphome/core/application.h"
+#include "esphome/core/version.h"
+#ifdef USE_WIFI
+#include "esphome/components/wifi/scan_list.h"
+#include "esphome/components/wifi/wifi_component.h"
+#endif
+#ifdef USE_API
+#include "esphome/components/api/api_server.h"
+#endif
 #include "esphome/core/log.h"
 #include "page.h"
 #include "wmb_decoder.h"
@@ -23,6 +31,9 @@ static constexpr uint32_t STACK = 4096;
 static constexpr UBaseType_t PRIORITY = 3;  // nad pętlą ESPHome (1): długa operacja w pętli nie gubi ramek
 static constexpr uint32_t STATS_EVERY_MS = 60000;
 static constexpr const char *RSSI_KEY = "rssi_dbm";
+static constexpr uint32_t BLINK_MS = 150;
+static constexpr uint32_t RESET_HOLD_MS = 10000;  // przytrzymanie BOOT: ustawienia fabryczne
+static constexpr uint32_t RESET_SHOW_MS = 2000;   // od tej chwili dioda świeci na biało
 
 // ======================= pomocnicze =======================
 
@@ -128,6 +139,14 @@ HaMeta ha_meta(const SelField &f, Media media) {
 void Sihos16::setup() {
   this->load_meters_();
   this->bind_entities_();
+
+  this->led_pref_ = global_preferences->make_preference<LedConfig>(fnv1_hash("sihos16_leds_v1"), true);
+  LedConfig lc;
+  if (this->led_pref_.load(&lc) && lc.version == 1) this->leds_ = lc;
+  if (this->reset_pin_ != nullptr) this->reset_pin_->setup();
+#ifdef USE_OUTPUT
+  if (this->status_led_ != nullptr) this->status_led_->turn_off();
+#endif
 
   if (this->web_base_ != nullptr) {
     this->web_base_->init();
@@ -276,6 +295,131 @@ void Sihos16::loop() {
     this->reboot_at_ = now + 1500;
   }
   if (this->reboot_at_ != 0 && static_cast<int32_t>(now - this->reboot_at_) >= 0) App.safe_reboot();
+
+  bool save_leds = false;
+  {
+    LockGuard g(this->lock_);
+    save_leds = this->pending_leds_;
+    this->pending_leds_ = false;
+  }
+  if (save_leds) {
+    this->led_pref_.save(&this->leds_);
+    global_preferences->sync();
+    this->led_color_ = 0xFFFFFFFF;  // wymuś odświeżenie diody
+  }
+  if (now - this->wifi_cache_ms_ >= 2000) {
+    this->wifi_cache_ms_ = now;
+    this->refresh_wifi_cache_();
+  }
+  this->check_reset_button_(now);
+  if (now - this->last_led_ms_ >= 250) {
+    this->last_led_ms_ = now;
+    this->update_leds_(now);
+  }
+#ifdef USE_OUTPUT
+  if (this->blink_off_at_ != 0 && static_cast<int32_t>(now - this->blink_off_at_) >= 0) {
+    this->blink_off_at_ = 0;
+    if (this->status_led_ != nullptr) this->status_led_->turn_off();
+  }
+#endif
+}
+
+// ======================= diody, przycisk, WiFi =======================
+
+void Sihos16::blink_(uint32_t now) {
+#ifdef USE_OUTPUT
+  if (this->status_led_ == nullptr) return;
+  this->status_led_->turn_on();
+  this->blink_off_at_ = now + BLINK_MS;
+#endif
+}
+
+void Sihos16::update_leds_(uint32_t now) {
+#ifdef USE_LIGHT
+  if (this->rgb_ == nullptr) return;
+  uint32_t color;  // 0xRRGGBB, 0x1000000 = wyłączona
+  if (this->resetting_) {
+    color = (now / 250) % 2 ? 0xFFFFFF : 0x1000000;  // miga na biało: puść, żeby przerwać
+  } else if (!this->leds_.rgb_on) {
+    color = 0x1000000;
+  } else if (this->wifi_ap_ && !this->wifi_connected_) {
+    color = 0x0000FF;  // hotspot konfiguracji
+  } else if (!this->wifi_connected_) {
+    color = 0xFF0000;
+  } else {
+#ifdef USE_API
+    color = api::global_api_server != nullptr && api::global_api_server->is_connected() ? 0x00FF00 : 0xFFA000;
+#else
+    color = 0x00FF00;
+#endif
+  }
+  uint32_t key = color ^ (static_cast<uint32_t>(this->leds_.brightness) << 25);
+  if (key == this->led_color_) return;
+  this->led_color_ = key;
+  auto call = this->rgb_->make_call();
+  if (color & 0x1000000) {
+    call.set_state(false);
+  } else {
+    call.set_state(true);
+    call.set_rgb(((color >> 16) & 0xFF) / 255.0f, ((color >> 8) & 0xFF) / 255.0f, (color & 0xFF) / 255.0f);
+    call.set_brightness(this->resetting_ ? 1.0f : this->leds_.brightness / 100.0f);
+  }
+  call.set_transition_length(0);
+  call.perform();
+#endif
+}
+
+void Sihos16::check_reset_button_(uint32_t now) {
+  if (this->reset_pin_ == nullptr) return;
+  if (!this->reset_pin_->digital_read()) {
+    this->reset_pressed_ms_ = 0;
+    this->resetting_ = false;
+    return;
+  }
+  if (this->reset_pressed_ms_ == 0) this->reset_pressed_ms_ = now;
+  uint32_t held = now - this->reset_pressed_ms_;
+  this->resetting_ = held >= RESET_SHOW_MS;
+  if (held >= RESET_HOLD_MS) this->factory_reset_();
+}
+
+void Sihos16::factory_reset_() {
+  ESP_LOGW(TAG, "Ustawienia fabryczne: kasuję sieć WiFi i liczniki, restart");
+  global_preferences->reset();
+  App.safe_reboot();
+}
+
+void Sihos16::refresh_wifi_cache_() {
+#ifdef USE_WIFI
+  auto *w = wifi::global_wifi_component;
+  if (w == nullptr) return;
+  std::vector<WifiNet> nets;
+  {
+    wifi::ScanResultsLock sl(w);
+    const auto &res = w->get_scan_result();
+    for (const auto &sr : res) {
+      bool auth = false;
+      if (!wifi::should_show_scan_entry(res, sr, auth)) continue;
+      nets.push_back({std::string(sr.get_ssid().c_str(), sr.get_ssid().size()), sr.get_rssi(), auth});
+    }
+  }
+  bool connected = w->is_connected();
+  std::string ssid, ip;
+  int8_t rssi = 0;
+  if (connected) {
+    char buf[wifi::SSID_BUFFER_SIZE];
+    ssid = w->wifi_ssid_to(buf);
+    rssi = w->wifi_rssi();
+    char ipb[network::IP_ADDRESS_BUFFER_SIZE];
+    ip = w->get_ip_addresses()[0].str_to(ipb);
+  }
+  LockGuard g(this->lock_);
+  if (!nets.empty() || !connected) this->wifi_cache_ = std::move(nets);
+  this->wifi_connected_ = connected;
+  this->wifi_ap_ = w->is_ap_active();
+  this->wifi_ssid_ = ssid;
+  this->wifi_ip_ = ip;
+  this->wifi_rssi_ = rssi;
+#endif
 }
 
 int Sihos16::find_meter_(const Address &a) const {
@@ -295,6 +439,7 @@ void Sihos16::handle_frame_(const RadioFrame &f) {
     Result r = decode(f.data, f.len, c.has_key ? c.key : nullptr, c.driver);
     ESP_LOGI(TAG, "%s (%08" PRIx32 "): %s, %d dBm, pól %u", c.name, a.id, status_str(r.status), f.rssi,
              static_cast<unsigned>(r.fields.size()));
+    if (this->leds_.blink >= 1) this->blink_(millis());
     {
       LockGuard g(this->lock_);
       MeterState &st = this->state_[s];
@@ -310,6 +455,7 @@ void Sihos16::handle_frame_(const RadioFrame &f) {
   }
 
   // Licznik spoza konfiguracji: pamiętamy do podglądu na stronie.
+  if (this->leds_.blink == 2) this->blink_(millis());
   Result r = decode(f.data, f.len, nullptr, "auto");
   ESP_LOGD(TAG, "w okolicy: %s %08" PRIx32 " typ %02X (%s), %d dBm, %s", mfct_str(a.mfct).c_str(), a.id, a.type,
            media_str(r.media), f.rssi, status_str(r.status));
@@ -389,6 +535,10 @@ bool Sihos16::canHandle(AsyncWebServerRequest *request) const {
   char buf[AsyncWebServerRequest::URL_BUF_SIZE];
   StringRef url = request->url_to(buf);
   if (strncmp(url.c_str(), "/sihos16", 8) == 0) return true;
+#ifdef USE_WIFI
+  // Hotspot konfiguracji: każdy adres GET pokazuje naszą stronę (telefon sam ją otworzy).
+  if (this->wifi_ap_ && !this->wifi_connected_ && request->method() == HTTP_GET && url != "/update") return true;
+#endif
 #ifndef USE_WEBSERVER
   if (url == "/") return true;  // bez web_server strona liczników jest stroną główną
 #endif
@@ -408,6 +558,17 @@ void Sihos16::handleRequest(AsyncWebServerRequest *req) {
     this->handle_save_(req);
   } else if (url == "/sihos16/api/delete" && req->method() == HTTP_POST) {
     this->handle_delete_(req);
+  } else if (url == "/sihos16/api/system") {
+    this->send_system_(req);
+  } else if (url == "/sihos16/api/wifi" && req->method() == HTTP_POST) {
+    this->handle_wifi_(req);
+  } else if (url == "/sihos16/api/leds" && req->method() == HTTP_POST) {
+    this->handle_leds_(req);
+  } else if (url == "/sihos16/api/factory_reset" && req->method() == HTTP_POST) {
+    req->send(200, "application/json", "{\"ok\":true}");
+    this->defer([this]() { this->factory_reset_(); });
+  } else if (req->method() == HTTP_GET && strncmp(url.c_str(), "/sihos16/", 9) != 0) {
+    req->send(200, "text/html; charset=utf-8", PAGE_HTML);  // hotspot: wykrywanie portalu przez telefon
   } else {
     req->send(404, "text/plain", "Nie ma takiej strony");
   }
@@ -672,6 +833,84 @@ void Sihos16::handle_delete_(AsyncWebServerRequest *req) {
   this->pending_cfg_ = MeterConfig{};
   this->pending_slot_ = slot;
   this->pending_save_ = true;
+  req->send(200, "application/json", "{\"ok\":true}");
+}
+
+void Sihos16::send_system_(AsyncWebServerRequest *req) {
+  std::string o = "{";
+  json_kv(o, "name", App.get_friendly_name().empty() ? App.get_name().c_str() : App.get_friendly_name().c_str(), false);
+  json_kv(o, "host", App.get_name().c_str());
+  json_kv(o, "esphome", ESPHOME_VERSION);
+  json_kn(o, "uptime", millis() / 1000);
+  bool has_rgb = false, has_blink = false;
+#ifdef USE_LIGHT
+  has_rgb = this->rgb_ != nullptr;
+#endif
+#ifdef USE_OUTPUT
+  has_blink = this->status_led_ != nullptr;
+#endif
+  {
+    LockGuard g(this->lock_);
+    o += ",\"wifi\":{";
+    json_kn(o, "connected", this->wifi_connected_, false);
+    json_kn(o, "ap", this->wifi_ap_);
+    json_kv(o, "ssid", this->wifi_ssid_.c_str());
+    json_kv(o, "ip", this->wifi_ip_.c_str());
+    json_kn(o, "rssi", this->wifi_rssi_);
+    o += "},\"scan\":[";
+    for (size_t i = 0; i < this->wifi_cache_.size(); i++) {
+      const WifiNet &n = this->wifi_cache_[i];
+      if (i) o += ',';
+      o += '{';
+      json_kv(o, "ssid", n.ssid.c_str(), false);
+      json_kn(o, "rssi", n.rssi);
+      json_kn(o, "lock", n.lock);
+      o += '}';
+    }
+    o += "],\"leds\":{";
+    json_kn(o, "rgb", this->leds_.rgb_on, false);
+    json_kn(o, "brightness", this->leds_.brightness);
+    json_kn(o, "blink", this->leds_.blink);
+  }
+  json_kn(o, "has_rgb", has_rgb);
+  json_kn(o, "has_blink", has_blink);
+  json_kn(o, "has_button", this->reset_pin_ != nullptr);
+  o += "}}";
+  req->send(200, "application/json", o.c_str());
+}
+
+void Sihos16::handle_wifi_(AsyncWebServerRequest *req) {
+#ifdef USE_WIFI
+  std::string ssid = req->arg("ssid"), psk = req->arg("psk");
+  if (ssid.empty() || ssid.size() > 32) {
+    req->send(200, "application/json", "{\"ok\":false,\"error\":\"Podaj nazwę sieci (do 32 znaków)\"}");
+    return;
+  }
+  if (!psk.empty() && (psk.size() < 8 || psk.size() > 63)) {
+    req->send(200, "application/json", "{\"ok\":false,\"error\":\"Hasło WiFi ma od 8 do 63 znaków\"}");
+    return;
+  }
+  ESP_LOGI(TAG, "Nowa sieć WiFi ze strony: %s", ssid.c_str());
+  // Zapis do NVS w pętli głównej (jak w portalu ESPHome).
+  this->defer([ssid, psk]() { wifi::global_wifi_component->save_wifi_sta(ssid, psk); });
+  req->send(200, "application/json", "{\"ok\":true}");
+#else
+  req->send(200, "application/json", "{\"ok\":false,\"error\":\"Brak WiFi w tej konfiguracji\"}");
+#endif
+}
+
+void Sihos16::handle_leds_(AsyncWebServerRequest *req) {
+  LockGuard g(this->lock_);
+  if (req->hasArg("rgb")) this->leds_.rgb_on = atoi(req->arg("rgb").c_str()) ? 1 : 0;
+  if (req->hasArg("brightness")) {
+    int b = atoi(req->arg("brightness").c_str());
+    this->leds_.brightness = static_cast<uint8_t>(b < 1 ? 1 : b > 100 ? 100 : b);
+  }
+  if (req->hasArg("blink")) {
+    int b = atoi(req->arg("blink").c_str());
+    this->leds_.blink = static_cast<uint8_t>(b < 0 ? 0 : b > 2 ? 2 : b);
+  }
+  this->pending_leds_ = true;
   req->send(200, "application/json", "{\"ok\":true}");
 }
 

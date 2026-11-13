@@ -34,8 +34,19 @@ input,select{font:inherit;width:100%;padding:8px;border:1px solid var(--line);bo
 .ok{color:var(--ok)}.bad{color:var(--bad)}.msg{margin-top:10px}
 #form{display:none}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}@media(max-width:600px){.grid2{grid-template-columns:1fr}}
 </style></head><body>
-<header><b>SIHOS16</b><span>liczniki wM-Bus · SIH Reader 1.6</span><span id="radio"></span></header>
+<header><b id="dname">SIHOS16</b><span>liczniki wM-Bus · SIH Reader 1.6</span><span id="radio"></span></header>
 <main>
+<div class="card" id="wifi"><h3 style="margin:0">Sieć WiFi</h3><div class="mut" id="wstat">Sprawdzam…</div>
+ <div id="wform" style="display:none">
+  <div class="grid2">
+   <div><label>Sieć</label><select id="w_ssid" onchange="this.dataset.touched=1;wsel()"></select></div>
+   <div id="w_other" style="display:none"><label>Nazwa sieci (SSID)</label><input id="w_ssid2" maxlength="32" autocomplete="off"></div>
+   <div><label>Hasło</label><input id="w_psk" type="password" autocomplete="new-password" placeholder="puste = sieć otwarta"></div>
+  </div>
+  <div class="row msg"><button class="pri" onclick="wsave()">Zapisz i połącz</button><button onclick="wclose()" id="wcancel">Anuluj</button><span id="wmsg" class="mut"></span></div>
+ </div>
+ <div class="row msg" id="wbtn"><button onclick="wopen()">Zmień sieć WiFi</button></div>
+</div>
 <h2>Moje liczniki</h2><div id="meters"></div>
 <div class="card" id="form">
  <h3 id="ftitle" style="margin:0">Dodaj licznik</h3>
@@ -53,9 +64,22 @@ input,select{font:inherit;width:100%;padding:8px;border:1px solid var(--line);bo
 <h2>Słyszane w okolicy</h2>
 <div class="card scroll"><table><thead><tr><th>Producent</th><th>Numer</th><th>Rodzaj</th><th>Sygnał</th><th>Ramek</th><th>Ostatnio</th><th>Stan</th><th></th></tr></thead><tbody id="heard"></tbody></table>
 <p class="mut">Lista odświeża się co 5 s. Ramki zaszyfrowane pokazują „brak klucza” — klucz wpisujesz przy dodawaniu.</p></div>
+<h2>Diody</h2>
+<div class="card" id="leds"><div class="grid2">
+ <div id="l_rgbw"><label>Dioda RGB (stan modułu)</label><select id="l_rgb" onchange="lsave()"><option value="1">włączona</option><option value="0">wyłączona</option></select></div>
+ <div id="l_brw"><label>Jasność diody RGB: <span id="l_brv"></span>%</label><input type="range" id="l_br" min="1" max="100" oninput="$('l_brv').textContent=this.value" onchange="lsave()"></div>
+ <div id="l_blw"><label>Dioda odbioru</label><select id="l_bl" onchange="lsave()"><option value="1">mruga przy ramkach moich liczników</option><option value="2">mruga przy każdej ramce</option><option value="0">wyłączona</option></select></div>
+</div><p class="mut">Kolory: <b style="color:#3b82f6">niebieski</b> — hotspot konfiguracji, <b style="color:#ef4444">czerwony</b> — brak WiFi, <b style="color:#eab308">żółty</b> — WiFi bez Home Assistant, <b style="color:#22c55e">zielony</b> — połączono z Home Assistant, biały miga — przytrzymany przycisk BOOT.</p></div>
+<h2>Moduł</h2>
+<div class="card">
+ <div class="mut" id="sysinfo"></div>
+ <label>Aktualizacja oprogramowania (plik .bin z ESPHome)</label>
+ <div class="row"><input type="file" id="fw" accept=".bin" style="width:auto;flex:1"><button onclick="fwup()">Wgraj</button></div><div class="mut" id="fwmsg"></div>
+ <div class="row msg"><button class="del" onclick="freset()">Przywróć ustawienia fabryczne</button><span class="mut">kasuje sieć WiFi i wszystkie liczniki; moduł uruchomi hotspot konfiguracji<span id="btnhint"></span></span></div>
+</div>
 </main>
 <script>
-const $=id=>document.getElementById(id);let S=null,edit=null,prev=null;
+const $=id=>document.getElementById(id);let S=null,edit=null,prev=null,Y=null,wopened=false,lfilled=false;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ago=s=>s<0?'—':s<60?s+' s temu':s<3600?Math.floor(s/60)+' min temu':Math.floor(s/3600)+' h temu';
 const fmt=(v,u)=>v===undefined?'—':(typeof v==='number'?(+v.toFixed(3)).toLocaleString('pl-PL'):esc(v))+(u?' '+esc(u):'');
@@ -71,6 +95,55 @@ async function load(){
  const h=[...S.heard].sort((a,b)=>b.rssi-a.rssi);
  $('heard').innerHTML=h.map(x=>`<tr><td>${esc(x.mfct)}</td><td class="num">${x.id}</td><td>${esc(x.media)} <span class="mut">${x.driver}</span></td><td class="num">${x.rssi} dBm</td><td class="num">${x.count}</td><td>${ago(x.seen)}</td><td class="${x.status=='OK'?'ok':'mut'}">${esc(x.status)}</td><td><button onclick="addHeard('${x.id}','${x.mfct}')">Dodaj</button></td></tr>`).join('')||'<tr><td colspan="8" class="mut">Jeszcze nic nie odebrano.</td></tr>';
  if(!$('f_drv').options.length)$('f_drv').innerHTML=S.drivers.map(d=>`<option>${d}</option>`).join('');
+}
+async function sys(){
+ if(!$('wstat'))return;
+ try{Y=await (await fetch('/sihos16/api/system')).json()}catch(e){return}
+ const w=Y.wifi;$('dname').textContent=Y.name;
+ $('wstat').innerHTML=w.connected?`Połączono z <b>${esc(w.ssid)}</b> · ${w.rssi} dBm · adres <b>${esc(w.ip)}</b> · http://${esc(Y.host)}.local`
+  :(w.ap?'<span class="bad">Moduł nie ma jeszcze sieci WiFi.</span> Wybierz swoją sieć, wpisz hasło i zapisz — dane zostaną w pamięci modułu.':'<span class="bad">Brak połączenia z siecią WiFi.</span>');
+ if(!w.connected&&!wopened)wopen();$('wcancel').style.display=w.connected?'':'none';
+ const sel=$('w_ssid');if(document.activeElement!==sel){const cur=sel.value;
+  const nets=[...Y.scan].sort((a,b)=>b.rssi-a.rssi);
+  sel.innerHTML=nets.map(n=>`<option value="${esc(n.ssid)}">${esc(n.ssid)} (${n.rssi} dBm${n.lock?', hasło':''})</option>`).join('')+'<option value="">Inna sieć (wpisz nazwę)…</option>';
+  if(sel.dataset.touched&&[...sel.options].some(o=>o.value===cur))sel.value=cur;wsel()}
+ const L=Y.leds;$('l_rgbw').style.display=$('l_brw').style.display=Y.has_rgb?'':'none';$('l_blw').style.display=Y.has_blink?'':'none';
+ if(!lfilled){lfilled=true;$('l_rgb').value=L.rgb;$('l_br').value=L.brightness;$('l_brv').textContent=L.brightness;$('l_bl').value=L.blink}
+ $('btnhint').textContent=Y.has_button?' (albo przytrzymaj przycisk BOOT na module przez 10 s)':'';
+ const u=Y.uptime;$('sysinfo').textContent=`${Y.name} · ESPHome ${Y.esphome} · działa ${u<3600?Math.floor(u/60)+' min':Math.floor(u/3600)+' h'}`;
+}
+function wopen(){wopened=true;$('wform').style.display='block';$('wbtn').style.display='none'}
+function wclose(){$('wform').style.display='none';$('wbtn').style.display=''}
+function wsel(){$('w_other').style.display=$('w_ssid').value===''?'block':'none'}
+async function wsave(){
+ const ssid=$('w_ssid').value||$('w_ssid2').value.trim(),psk=$('w_psk').value;
+ if(!ssid){$('wmsg').textContent='Wybierz albo wpisz nazwę sieci.';return}
+ if(psk&&psk.length<8){$('wmsg').innerHTML='<span class="bad">Hasło WiFi ma co najmniej 8 znaków.</span>';return}
+ let r;try{r=await (await fetch('/sihos16/api/wifi',{method:'POST',body:new URLSearchParams({ssid,psk})})).json()}catch(e){r={ok:false,error:'Brak odpowiedzi modułu.'}}
+ if(!r.ok){$('wmsg').innerHTML=`<span class="bad">${esc(r.error)}</span>`;return}
+ const host=Y?Y.host:'sih-reader';
+ document.body.innerHTML=`<main><div class="card"><h3>Zapisano sieć „${esc(ssid)}”</h3><p>Moduł łączy się teraz z Twoją siecią i za chwilę wyłączy swój hotspot.</p>
+ <p>Połącz telefon lub komputer z siecią <b>${esc(ssid)}</b> i otwórz <b>http://${esc(host)}.local</b> albo adres modułu odczytany z routera. Home Assistant sam znajdzie nowe urządzenie ESPHome.</p>
+ <p class="mut">Jeśli hasło było błędne, moduł po około minucie znowu uruchomi hotspot — połącz się z nim ponownie i popraw dane.</p></div></main>`;
+}
+async function lsave(){
+ await fetch('/sihos16/api/leds',{method:'POST',body:new URLSearchParams({rgb:$('l_rgb').value,brightness:$('l_br').value,blink:$('l_bl').value})});
+}
+async function fwup(){
+ const f=$('fw').files[0];if(!f){$('fwmsg').textContent='Wybierz plik .bin.';return}
+ if(!confirm(`Wgrać „${f.name}” (${Math.round(f.size/1024)} kB)? Moduł uruchomi się ponownie.`))return;
+ const fd=new FormData();fd.append('update',f,f.name);$('fwmsg').textContent='Wgrywam… nie wyłączaj modułu.';
+ try{const r=await fetch('/update',{method:'POST',body:fd});
+  if(r.status===404){$('fwmsg').innerHTML='<span class="bad">Ta wersja nie obsługuje aktualizacji ze strony (w YAML brak <i>ota: - platform: web_server</i>).</span>';return}
+  if(!r.ok){$('fwmsg').innerHTML=`<span class="bad">Błąd aktualizacji (${r.status}).</span>`;return}
+ }catch(e){}
+ waitReboot();
+}
+async function freset(){
+ if(!confirm('Przywrócić ustawienia fabryczne? Zostaną skasowane: sieć WiFi i wszystkie liczniki.'))return;
+ if(!confirm('Na pewno? Moduł straci połączenie z siecią i uruchomi hotspot konfiguracji.'))return;
+ await fetch('/sihos16/api/factory_reset',{method:'POST'}).catch(()=>{});
+ document.body.innerHTML='<main><div class="card"><h3>Przywrócono ustawienia fabryczne</h3><p>Moduł uruchamia się ponownie i włączy hotspot konfiguracji (dioda niebieska). Połącz się z nim, aby ustawić sieć WiFi.</p></div></main>';
 }
 function openForm(slot){
  edit=slot===undefined?null:S.meters.find(m=>m.slot===slot);prev=null;
@@ -120,7 +193,7 @@ function waitReboot(){
  document.body.innerHTML='<main><div class="card"><h3>Zapisano. Moduł uruchamia się ponownie…</h3><p class="mut">Strona odświeży się sama, gdy moduł wróci (ok. 15 s).</p></div></main>';
  setTimeout(function t(){fetch('/sihos16/api/state').then(()=>location.reload()).catch(()=>setTimeout(t,2000))},6000);
 }
-load();setInterval(()=>{const f=$('form');if(f&&f.style.display!=='block')load()},5000);
+load();sys();setInterval(()=>{const f=$('form');if(f&&f.style.display!=='block')load();sys()},5000);
 </script></body></html>)HTML";
 
 }  // namespace esphome::sihos16

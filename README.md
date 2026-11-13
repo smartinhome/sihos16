@@ -13,7 +13,7 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 | 3 | Radio CC1101 | ✅ (do sprawdzenia na module) |
 | 4 | Komponent ESPHome: liczniki jako urządzenia w HA | ✅ (do sprawdzenia na module) |
 | 5 | Strona konfiguracji w module | ✅ (do sprawdzenia na module) |
-| 6 | Diody, minimalny YAML, kompilacja | ⏳ |
+| 6 | Diody, WiFi ze strony, ustawienia fabryczne, aktualizacja .bin | ✅ (do sprawdzenia na module) |
 
 ## Dekoder
 
@@ -40,6 +40,21 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 
 
 
+## Pierwsze uruchomienie u klienta
+
+YAML nie zawiera sieci WiFi (`examples/sih-reader-1.6.yaml`), więc moduł bez zapisanej sieci uruchamia hotspot **SIH Reader** (dioda niebieska):
+
+1. Klient łączy się z hotspotem telefonem — strona modułu otwiera się sama (portal).
+2. Wybiera swoją sieć z listy (albo wpisuje nazwę), podaje hasło → „Zapisz i połącz”. Dane trafiają do pamięci modułu.
+3. Moduł łączy się z siecią, Home Assistant wykrywa nowe urządzenie ESPHome, strona jest pod `http://sih-reader.local/`.
+4. Błędne hasło: po około minucie moduł znowu uruchamia hotspot.
+
+**Ustawienia fabryczne** (sieć WiFi + liczniki): przycisk na stronie albo przytrzymanie przycisku **BOOT** przez 10 s (dioda miga na biało od 2. sekundy, puszczenie przerywa). Moduł wraca do hotspotu — gotowy do przekazania klientowi.
+
+**Diody:** RGB — niebieska: hotspot konfiguracji, czerwona: brak WiFi, żółta: WiFi bez Home Assistant, zielona: połączono z HA. Dioda odbioru mruga przy ramkach moich liczników (albo wszystkich, albo wcale). Jasność i tryby — na stronie, bez restartu.
+
+**Aktualizacja:** plik `.bin` (OTA) wgrywany ze strony modułu (`ota: - platform: web_server`).
+
 ## Liczniki i Home Assistant
 
 Konfiguracja YAML jest minimalna (`examples/sih-reader-1.6.yaml`): WiFi, piny i komponent `sihos16`. Liczniki dodaje się na stronie modułu `http://<adres>/` (albo `/sihos16`, gdy w YAML jest też `web_server`):
@@ -51,7 +66,7 @@ Konfiguracja YAML jest minimalna (`examples/sih-reader-1.6.yaml`): WiFi, piny i 
 
 Jak to działa: przy kompilacji powstaje pula 8 urządzeń, a w każdym 16 encji liczbowych i 4 tekstowe. Przy starcie moduł nadaje zajętym nazwy, jednostki i klasy z konfiguracji w NVS; reszta jest ukryta. Usunięty licznik znika z HA razem z urządzeniem.
 
-API strony: `GET /sihos16/api/state`, `GET /sihos16/api/preview?id=&key=&driver=`, `POST /sihos16/api/save`, `POST /sihos16/api/delete`.
+API strony: `GET /sihos16/api/state`, `GET /sihos16/api/preview?id=&key=&driver=`, `POST /sihos16/api/save`, `POST /sihos16/api/delete`, `GET /sihos16/api/system`, `POST /sihos16/api/wifi`, `POST /sihos16/api/leds`, `POST /sihos16/api/factory_reset`.
 
 ## Testy na komputerze
 

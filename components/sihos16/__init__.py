@@ -8,7 +8,7 @@ z konfiguracji zapisanej w pamięci, a nieużyte encje pozostają ukryte.
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import pins
-from esphome.components import spi, web_server_base
+from esphome.components import light, output, spi, web_server_base
 from esphome.components.web_server_base import CONF_WEB_SERVER_BASE_ID
 from esphome.const import CONF_FREQUENCY, CONF_ID
 from esphome.core import CORE, ID
@@ -21,6 +21,9 @@ AUTO_LOAD = ["sensor", "text_sensor", "web_server_base"]
 
 CONF_GDO0_PIN = "gdo0_pin"
 CONF_GDO2_PIN = "gdo2_pin"
+CONF_RGB_LED = "rgb_led"
+CONF_STATUS_LED = "status_led"
+CONF_RESET_PIN = "factory_reset_pin"
 
 MAX_METERS = 8
 MAX_NUM_FIELDS = 16
@@ -47,6 +50,11 @@ CONFIG_SCHEMA = (
             cv.Required(CONF_GDO0_PIN): pins.internal_gpio_input_pin_schema,
             cv.Required(CONF_GDO2_PIN): pins.internal_gpio_input_pin_schema,
             cv.Optional(CONF_FREQUENCY, default=868.95): cv.float_range(min=868.0, max=870.0),
+            # Dioda RGB pokazująca stan modułu (light), dioda mrugająca przy ramkach (output),
+            # przycisk: przytrzymanie 10 s = ustawienia fabryczne (sieć WiFi i liczniki).
+            cv.Optional(CONF_RGB_LED): cv.use_id(light.LightState),
+            cv.Optional(CONF_STATUS_LED): cv.use_id(output.BinaryOutput),
+            cv.Optional(CONF_RESET_PIN): pins.internal_gpio_input_pin_schema,
         }
     )
     .extend(cv.COMPONENT_SCHEMA)
@@ -65,6 +73,12 @@ async def to_code(config):
     cg.add(var.set_gdo0_pin(await cg.gpio_pin_expression(config[CONF_GDO0_PIN])))
     cg.add(var.set_gdo2_pin(await cg.gpio_pin_expression(config[CONF_GDO2_PIN])))
     cg.add(var.set_frequency(config[CONF_FREQUENCY]))
+    if CONF_RGB_LED in config:
+        cg.add(var.set_rgb_led(await cg.get_variable(config[CONF_RGB_LED])))
+    if CONF_STATUS_LED in config:
+        cg.add(var.set_status_led(await cg.get_variable(config[CONF_STATUS_LED])))
+    if CONF_RESET_PIN in config:
+        cg.add(var.set_reset_pin(await cg.gpio_pin_expression(config[CONF_RESET_PIN])))
     base = await cg.get_variable(config[CONF_WEB_SERVER_BASE_ID])
     cg.add(var.set_web_base(base))
 
