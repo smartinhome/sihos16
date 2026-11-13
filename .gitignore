@@ -1,0 +1,4 @@
+tests/host/decode_cli
+__pycache__/
+*.pyc
+.esphome/

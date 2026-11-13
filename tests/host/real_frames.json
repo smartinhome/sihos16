@@ -1,0 +1,37 @@
+[
+ {
+  "name": "Sanxing S34U28 (KPL), klient Tauron",
+  "telegram": "9e440cae4077157201027af10090050879575b4a27181e113d4e03510cdded80162bb4f038f5d022dd4b1f894bc6d10f816918d86155ad0c63bb0a1ea1994ecafc90a9324ba0d31f984d8991fdec4fb95f96577dffb8b9d99794736901f5cc244db87cf84753dc3d950eef03496bf6a31138106f3f68c0bb5f0e1e2b3f549dfdcf3754d6ad3f33cf93a4cda45c0ba267daa21b25dc892603d0da802cfcd584",
+  "key": "24F1C3BAE16CAE097ACF748479AAF9C8",
+  "fields": {
+   "energy_kwh": 1597.046,
+   "energy_t1_kwh": 1311.524,
+   "energy_t2_kwh": 43.048,
+   "energy_t3_kwh": 242.474,
+   "energy_backward_kwh": 427.215,
+   "energy_backward_t1_kwh": 126.962,
+   "energy_backward_t2_kwh": 37.178,
+   "energy_backward_t3_kwh": 263.075,
+   "power_w": 210,
+   "power_backward_w": 197,
+   "power_max_w": 2972,
+   "voltage_l1_v": 228,
+   "voltage_l2_v": 230,
+   "voltage_l3_v": 231,
+   "datetime": "2026-11-10 20:59:44",
+   "fabrication_no": "72157740",
+   "status": "OK"
+  }
+ },
+ {
+  "name": "Sanxing ze złym kluczem",
+  "telegram": "9e440cae4077157201027af10090050879575b4a27181e113d4e03510cdded80162bb4f038f5d022dd4b1f894bc6d10f816918d86155ad0c63bb0a1ea1994ecafc90a9324ba0d31f984d8991fdec4fb95f96577dffb8b9d99794736901f5cc244db87cf84753dc3d950eef03496bf6a31138106f3f68c0bb5f0e1e2b3f549dfdcf3754d6ad3f33cf93a4cda45c0ba267daa21b25dc892603d0da802cfcd584",
+  "key": "24F1C3BAE16CAE097ACF748479AAF9C9",
+  "status": "zły klucz"
+ },
+ {
+  "name": "Sanxing bez klucza",
+  "telegram": "9e440cae4077157201027af10090050879575b4a27181e113d4e03510cdded80162bb4f038f5d022dd4b1f894bc6d10f816918d86155ad0c63bb0a1ea1994ecafc90a9324ba0d31f984d8991fdec4fb95f96577dffb8b9d99794736901f5cc244db87cf84753dc3d950eef03496bf6a31138106f3f68c0bb5f0e1e2b3f549dfdcf3754d6ad3f33cf93a4cda45c0ba267daa21b25dc892603d0da802cfcd584",
+  "status": "brak klucza"
+ }
+]
