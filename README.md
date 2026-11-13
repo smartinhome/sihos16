@@ -11,8 +11,8 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 | 1 | Własny dekoder wM-Bus + testy na komputerze | ✅ |
 | 2 | Sterowniki formatów producenta: Izar, Apator 162, Hydrodigit | ✅ |
 | 3 | Radio CC1101 | ✅ (do sprawdzenia na module) |
-| 4 | Komponent ESPHome: liczniki jako urządzenia w HA | ⏳ |
-| 5 | Strona konfiguracji w module | ⏳ |
+| 4 | Komponent ESPHome: liczniki jako urządzenia w HA | ✅ (do sprawdzenia na module) |
+| 5 | Strona konfiguracji w module | ✅ (do sprawdzenia na module) |
 | 6 | Diody, minimalny YAML, kompilacja | ⏳ |
 
 ## Dekoder
@@ -38,7 +38,20 @@ Liczniki dodaje się na stronie modułu, bez kompilacji. Każdy licznik pojawia 
 - CRC sprawdzane już w radiu (`wmb_link.*`): do dekodera trafiają tylko poprawne ramki, szum jest liczony i odrzucany.
 - Kolejka 8 ramek, pętla opróżnia ją w całości; co minutę statystyka w logu.
 
-Test na module: `examples/krok3-test-radia.yaml`.
+
+
+## Liczniki i Home Assistant
+
+Konfiguracja YAML jest minimalna (`examples/sih-reader-1.6.yaml`): WiFi, piny i komponent `sihos16`. Liczniki dodaje się na stronie modułu `http://<adres>/` (albo `/sihos16`, gdy w YAML jest też `web_server`):
+
+1. Lista „Słyszane w okolicy” pokazuje liczniki w zasięgu (producent, numer, rodzaj, sygnał).
+2. „Dodaj” → nazwa, klucz AES (32 znaki hex lub 16 znaków tekstu, np. klucz PGE) → „Sprawdź i pokaż pola” dekoduje ostatnią ramkę i pokazuje wszystkie pola z wartościami.
+3. Zaznaczasz pola (do 16 liczbowych i 4 tekstowych) → „Zapisz”: konfiguracja trafia do pamięci modułu, moduł uruchamia się ponownie.
+4. Licznik pojawia się w Home Assistant jako **osobne urządzenie** z encjami o polskich nazwach, jednostkach i klasach (energia, woda, gaz, moc, napięcie…) — energia i objętość od razu nadają się do panelu Energia.
+
+Jak to działa: przy kompilacji powstaje pula 8 urządzeń, a w każdym 16 encji liczbowych i 4 tekstowe. Przy starcie moduł nadaje zajętym nazwy, jednostki i klasy z konfiguracji w NVS; reszta jest ukryta. Usunięty licznik znika z HA razem z urządzeniem.
+
+API strony: `GET /sihos16/api/state`, `GET /sihos16/api/preview?id=&key=&driver=`, `POST /sihos16/api/save`, `POST /sihos16/api/delete`.
 
 ## Testy na komputerze
 

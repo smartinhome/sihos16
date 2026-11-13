@@ -1,11 +1,13 @@
-# SIHOS16 — test kroku 3: radio CC1101 + dekoder.
-# Liczniki nie są jeszcze konfigurowane: moduł loguje każdą odebraną ramkę
-# (tryb, RSSI, producent, numer, typ, wynik dekodowania) i co minutę statystykę radia.
-# Ramki zaszyfrowane pokażą „brak klucza” — klucze dojdą w kroku 4.
+# SIHOS16 — SIH Reader 1.6 (LOLIN S3 mini + CC1101).
+# Liczniki dodaje się na stronie modułu: http://<adres modułu>/  (lub /sihos16)
+# Każdy licznik pojawia się w Home Assistant jako osobne urządzenie.
 
 esphome:
-  name: sihos16
-  friendly_name: SIHOS16
+  name: sih-reader
+  friendly_name: SIH Reader
+  project:
+    name: smartinhome.sihos16
+    version: "16.0.0"
 
 esp32:
   board: lolin_s3_mini
@@ -16,7 +18,7 @@ esp32:
     type: esp-idf
 
 logger:
-  level: DEBUG
+  level: INFO   # DEBUG pokazuje też każdą ramkę i każde pole
 
 api:
 
@@ -26,7 +28,7 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  ap:
+  ap:            # bez dostępu do sieci moduł tworzy własną sieć z portalem konfiguracji WiFi
 
 captive_portal:
 
